@@ -7,29 +7,18 @@
     tools:context=".MainActivity">
 
 
-    <TextView
-        android:id="@+id/mainActivityVideoPlayerTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/video_player"
-        android:textColor="@android:color/black"
-        android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="@+id/mainActivityVideoSourceTextView"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <FrameLayout
         android:id="@+id/videoContainerLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="32dp"
-        app:layout_constraintBottom_toTopOf="@+id/mainActivityVideoSourceTextView"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/urlContainerLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainActivityVideoPlayerTextView">
+        app:layout_constraintTop_toTopOf="parent">
 
         <VideoView
             android:id="@+id/mainActivityVideoView"
@@ -44,111 +33,149 @@
             android:layout_height="100dp"
             android:layout_gravity="center"
             android:visibility="invisible" />
+
+        <ImageButton
+            android:id="@+id/fullscreenButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end"
+            android:background="@color/colorHighligh"
+            android:contentDescription="@string/todo"
+            android:onClick="onClickFullscreen"
+            android:padding="0dp"
+            android:scaleType="fitCenter"
+            android:tint="@android:color/background_light"
+            app:srcCompat="@drawable/fullscreen_icon" />
     </FrameLayout>
-
-    <TextView
-        android:id="@+id/mainActivityVideoSourceTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="@string/video_source"
-        android:textColor="@android:color/black"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/mainActivityUrlTextView"
-        app:layout_constraintStart_toStartOf="@+id/mainActivityUrlTextView" />
-
-    <EditText
-        android:id="@+id/mainActivityUrlTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:ems="10"
-        android:hint="@string/url_source"
-        android:inputType="textUri"
-        android:textColor="@android:color/black"
-        android:textColorLink="@color/colorAccent"
-        app:layout_constraintBottom_toBottomOf="@+id/mainActivityUrlPlayButton"
-        app:layout_constraintEnd_toStartOf="@+id/mainActivityUrlPlayButton"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/mainActivityUrlPlayButton"
-        tools:ignore="Autofill" />
-
-    <ImageButton
-        android:id="@+id/mainActivityUrlPlayButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:contentDescription="@string/todo"
-        android:onClick="onClickLoadUrl"
-        app:layout_constraintBottom_toBottomOf="@+id/mainActivityDivider"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_popup_sync" />
 
     <View
         android:id="@+id/mainActivityDivider"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="?android:attr/listDivider"
-        app:layout_constraintBottom_toTopOf="@+id/mainActivityFilePlayButton"
+        app:layout_constraintBottom_toTopOf="@+id/fileContainerLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <HorizontalScrollView
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/urlContainerLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/mainActivityFileSearchButton"
-        app:layout_constraintEnd_toStartOf="@+id/mainActivityFileSearchButton"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:padding="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/mainActivityDivider"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <TextView
-            android:id="@+id/mainActivityFileTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:singleLine="true"
-            android:text="@string/no_file_selected"
-            android:textColor="#999999"
-            android:textSize="18sp" />
-    </HorizontalScrollView>
+        <EditText
+            android:id="@+id/mainActivityUrlTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="16dp"
+            android:ems="10"
+            android:hint="@string/url_source"
+            android:inputType="textUri"
+            android:textColor="@android:color/black"
+            android:textColorLink="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="@+id/mainActivityUrlPlayButton"
+            app:layout_constraintEnd_toStartOf="@+id/mainActivityUrlPlayButton"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/mainActivityUrlPlayButton"
+            tools:ignore="Autofill" />
 
-    <ImageButton
-        android:id="@+id/mainActivityFileSearchButton"
-        android:layout_width="56dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="8dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:contentDescription="@string/todo"
-        android:onClick="performFileSearch"
-        android:tint="@android:color/background_light"
-        app:layout_constraintBottom_toBottomOf="@+id/mainActivityFilePlayButton"
-        app:layout_constraintEnd_toStartOf="@+id/mainActivityFilePlayButton"
-        app:layout_constraintTop_toTopOf="@+id/mainActivityFilePlayButton"
-        app:srcCompat="@drawable/folder_icon" />
+        <ImageButton
+            android:id="@+id/mainActivityUrlPlayButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:contentDescription="@string/todo"
+            android:onClick="onClickLoadUrl"
+            android:tint="@android:color/background_light"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/video_icon" />
+    </android.support.constraint.ConstraintLayout>
 
-    <ImageButton
-        android:id="@+id/mainActivityFilePlayButton"
-        android:layout_width="wrap_content"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/fileContainerLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:contentDescription="@string/todo"
-        android:onClick="onClickLoadFile"
+        android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/mainActivityUrlPlayButton"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/mainActivityUrlPlayButton"
-        app:srcCompat="@android:drawable/ic_popup_sync" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <HorizontalScrollView
+            android:id="@+id/horizontalScrollView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/mainActivityFileSearchButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/mainActivityFileTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="8dp"
+                android:gravity="bottom"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:singleLine="true"
+                android:text="@string/no_file_selected"
+                android:textColor="#999999"
+                android:textSize="18sp" />
+        </HorizontalScrollView>
+
+        <ImageButton
+            android:id="@+id/mainActivityFileSearchButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="0dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:contentDescription="@string/todo"
+            android:onClick="onClickFileSearch"
+            android:tint="@android:color/background_light"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/mainActivityFilePlayButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/folder_icon" />
+
+        <ImageButton
+            android:id="@+id/mainActivityFilePlayButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:contentDescription="@string/todo"
+            android:onClick="onClickLoadFile"
+            android:tint="@android:color/background_light"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/video_icon" />
+
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.MediaController;
@@ -17,17 +18,24 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Software Architecture for User Interfaces project
-     *
+     * <p>
      * Get test video Url's from this site:
      * https://www.sample-videos.com/
      */
 
+    private enum FileSource {
+        LOCAL, URL
+    }
+
+    private FileSource fileSource;
     private static final int READ_REQUEST_CODE = 42;
     private TextView filePathTextView;
     private TextView urlPathTextView;
     private VideoView videoView;
     private ProgressBar progressBar;
     private MediaController mediaController;
+    private ConstraintLayout urlBackground;
+    private ConstraintLayout fileBackground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         urlPathTextView = findViewById(R.id.mainActivityUrlTextView);
         videoView = findViewById(R.id.mainActivityVideoView);
         progressBar = findViewById(R.id.videoViewProgressBar);
+        urlBackground = findViewById(R.id.urlContainerLayout);
+        fileBackground = findViewById(R.id.fileContainerLayout);
 
         // Initialize variables
         mediaController = new MediaController(MainActivity.this);
@@ -77,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE); // hide progress bar
                 videoView.seekTo(1); // create thumbnail
                 videoView.pause(); // video starts instantly playing without this
+
+                setSourceTextViewColors();
             }
         });
 
@@ -94,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
             public boolean onError(MediaPlayer mp, int what, int extra) {
                 progressBar.setVisibility(View.GONE); // hides the progress bar
                 videoView.setVideoURI(null); // prevents error dialog from showing multiple times
+                urlBackground.setBackgroundColor(Color.TRANSPARENT); // no video source selected
+                fileBackground.setBackgroundColor(Color.TRANSPARENT); // no video source selected
                 return false;
             }
         });
@@ -117,24 +131,54 @@ public class MainActivity extends AppCompatActivity {
      * Fires an intent to spin up the "file chooser" UI and select a video.
      * https://developer.android.com/guide/topics/providers/document-provider
      */
-    public void performFileSearch(View view) {
+    public void onClickFileSearch(View view) {
+        videoView.setVideoURI(null); //stops playing current video
+        progressBar.setVisibility(View.GONE); //hides the progress bar in case it's till visible
+
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT)
                 .addCategory(Intent.CATEGORY_OPENABLE)
-                .setType("video/*");
+                .setType("video/*"); //shows only video files
 
         startActivityForResult(intent, READ_REQUEST_CODE);
     }
 
     public void onClickLoadFile(View view) {
+        fileSource = FileSource.LOCAL;
         progressBar.setVisibility(View.VISIBLE);
         videoView.setVideoURI(Uri.parse(filePathTextView.getText().toString()));
     }
 
     public void onClickLoadUrl(View view) {
+        fileSource = FileSource.URL;
         progressBar.setVisibility(View.VISIBLE);
         String urlInput = urlPathTextView.getText().toString();
         videoView.setVideoURI(Uri.parse(urlInput));
     }
 
+    /**
+     * TODO
+     * Saves the current state(video uri and timestamp, etc) and starts new activity.
+     */
+    public void onClickFullscreen(View view) {
+        Intent intent = new Intent(this, FullscreenActivity.class);
+
+
+
+        startActivity(intent);
+    }
+
     // endregion
+
+    /**
+     * Sets the background of the video source that is currently loaded.
+     */
+    private void setSourceTextViewColors() {
+        if (fileSource == FileSource.LOCAL) {
+            urlBackground.setBackgroundColor(Color.TRANSPARENT);
+            fileBackground.setBackgroundColor(getResources().getColor(R.color.colorHighligh));
+        } else {
+            fileBackground.setBackgroundColor(Color.TRANSPARENT);
+            urlBackground.setBackgroundColor(getResources().getColor(R.color.colorHighligh));
+        }
+    }
 }

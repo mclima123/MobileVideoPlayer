@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MobileVideoPlayer</string>
+    <string name="video_source">Video Source:</string>
+    <string name="url_source">URL source</string>
+    <string name="todo">TODO</string>
+    <string name="no_file_selected">No file selected</string>
+    <string name="video_player">Video Player:</string>
+    <string name="warning_dialog_message">Can\'t play this video.</string>
+    <string name="ok">OK</string>
+</resources>

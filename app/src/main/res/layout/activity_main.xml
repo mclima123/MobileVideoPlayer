@@ -6,59 +6,58 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-
-    <FrameLayout
-        android:id="@+id/videoContainerLayout"
+    <android.gesture.GestureOverlayView
+        android:id="@+id/gesturesOverlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:eventsInterceptionEnabled="false"
+        android:gestureStrokeType="multiple"
         app:layout_constraintBottom_toTopOf="@+id/urlContainerLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <VideoView
-            android:id="@+id/mainActivityVideoView"
+        <FrameLayout
+            android:id="@+id/videoContainerLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center" />
+            app:layout_constraintBottom_toTopOf="@+id/urlContainerLayout"
+            app:layout_constraintEnd_toEndOf="@+id/urlContainerLayout"
+            app:layout_constraintStart_toStartOf="@+id/urlContainerLayout"
+            app:layout_constraintTop_toTopOf="@+id/urlContainerLayout">
 
-        <ProgressBar
-            android:id="@+id/videoViewProgressBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android:visibility="invisible" />
+            <VideoView
+                android:id="@+id/videoView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center" />
 
-        <ImageButton
-            android:id="@+id/fullscreenButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="end"
-            android:background="@color/colorHighligh"
-            android:contentDescription="@string/todo"
-            android:onClick="onClickFullscreen"
-            android:padding="0dp"
-            android:scaleType="fitCenter"
-            android:tint="@android:color/background_light"
-            app:srcCompat="@drawable/fullscreen_icon" />
-    </FrameLayout>
+            <ProgressBar
+                android:id="@+id/videoViewProgressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:visibility="invisible" />
 
-    <View
-        android:id="@+id/mainActivityDivider"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="?android:attr/listDivider"
-        app:layout_constraintBottom_toTopOf="@+id/fileContainerLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+            <ImageButton
+                android:id="@+id/fullscreenButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="end"
+                android:background="@color/colorHighligh"
+                android:contentDescription="@string/todo"
+                android:onClick="onClickFullscreen"
+                android:padding="0dp"
+                android:scaleType="fitCenter"
+                android:tint="@android:color/background_light"
+                app:srcCompat="@drawable/fullscreen_icon" />
+        </FrameLayout>
+    </android.gesture.GestureOverlayView>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/urlContainerLayout"
@@ -68,30 +67,29 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:padding="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/mainActivityDivider"
+        app:layout_constraintBottom_toTopOf="@+id/divider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <EditText
-            android:id="@+id/mainActivityUrlTextView"
+            android:id="@+id/urlTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="0dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
             android:hint="@string/url_source"
             android:inputType="textUri"
             android:textColor="@android:color/black"
             android:textColorLink="@color/colorAccent"
-            app:layout_constraintBottom_toBottomOf="@+id/mainActivityUrlPlayButton"
-            app:layout_constraintEnd_toStartOf="@+id/mainActivityUrlPlayButton"
+            app:layout_constraintBottom_toBottomOf="@+id/urlPlayButton"
+            app:layout_constraintEnd_toStartOf="@+id/urlPlayButton"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/mainActivityUrlPlayButton"
+            app:layout_constraintTop_toTopOf="@+id/urlPlayButton"
             tools:ignore="Autofill" />
 
         <ImageButton
-            android:id="@+id/mainActivityUrlPlayButton"
+            android:id="@+id/urlPlayButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="0dp"
@@ -106,6 +104,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/video_icon" />
     </android.support.constraint.ConstraintLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintBottom_toTopOf="@+id/fileContainerLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/fileContainerLayout"
@@ -126,7 +136,7 @@
             android:layout_height="0dp"
             android:layout_marginEnd="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/mainActivityFileSearchButton"
+            app:layout_constraintEnd_toStartOf="@+id/fileSearchButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -135,6 +145,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
                 android:gravity="bottom"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
@@ -145,7 +156,7 @@
         </HorizontalScrollView>
 
         <ImageButton
-            android:id="@+id/mainActivityFileSearchButton"
+            android:id="@+id/fileSearchButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="0dp"
@@ -156,12 +167,12 @@
             android:onClick="onClickFileSearch"
             android:tint="@android:color/background_light"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/mainActivityFilePlayButton"
+            app:layout_constraintEnd_toStartOf="@+id/filePlayButton"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/folder_icon" />
 
         <ImageButton
-            android:id="@+id/mainActivityFilePlayButton"
+            android:id="@+id/filePlayButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="0dp"
@@ -177,5 +188,6 @@
             app:srcCompat="@drawable/video_icon" />
 
     </android.support.constraint.ConstraintLayout>
+
 
 </android.support.constraint.ConstraintLayout>

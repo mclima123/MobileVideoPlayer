@@ -2,6 +2,11 @@ package com.example.mobilevideoplayer;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.gesture.Gesture;
+import android.gesture.GestureLibraries;
+import android.gesture.GestureLibrary;
+import android.gesture.GestureOverlayView;
+import android.gesture.Prediction;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -12,9 +17,12 @@ import android.view.View;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements GestureOverlayView.OnGesturePerformedListener {
 
     /**
      * Software Architecture for User Interfaces project
@@ -36,25 +44,18 @@ public class MainActivity extends AppCompatActivity {
     private MediaController mediaController;
     private ConstraintLayout urlBackground;
     private ConstraintLayout fileBackground;
+    private GestureOverlayView gestureOverlayView;
+    private GestureLibrary gestureLib;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Find UI views
-        filePathTextView = findViewById(R.id.mainActivityFileTextView);
-        urlPathTextView = findViewById(R.id.mainActivityUrlTextView);
-        videoView = findViewById(R.id.mainActivityVideoView);
-        progressBar = findViewById(R.id.videoViewProgressBar);
-        urlBackground = findViewById(R.id.urlContainerLayout);
-        fileBackground = findViewById(R.id.fileContainerLayout);
-
-        // Initialize variables
-        mediaController = new MediaController(MainActivity.this);
-
+        initializeVariables();
         setVideoViewListeners();
         setUrlTextViewListener();
+        initializeCustomGestures();
     }
 
     @Override
@@ -65,6 +66,64 @@ public class MainActivity extends AppCompatActivity {
                 filePathTextView.setText(uri.toString());
                 filePathTextView.setTextColor(Color.BLACK);
             }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Toast.makeText(this, "main activity paused", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Toast.makeText(this, "main activity resumed", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
+        ArrayList<Prediction> predictions = gestureLib.recognize(gesture);
+
+        for (Prediction prediction : predictions) {
+            if (prediction.score > 1.0) {
+                Toast.makeText(this, prediction.name, Toast.LENGTH_SHORT).show();
+
+                switch (prediction.name) {
+                    case "restart": // circular gesture sets the timestamp to 0s
+                        videoView.seekTo(0);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Finds the UI views and initializes variables.
+     */
+    private void initializeVariables() {
+        filePathTextView = findViewById(R.id.mainActivityFileTextView);
+        urlPathTextView = findViewById(R.id.urlTextView);
+        videoView = findViewById(R.id.videoView);
+        progressBar = findViewById(R.id.videoViewProgressBar);
+        urlBackground = findViewById(R.id.urlContainerLayout);
+        fileBackground = findViewById(R.id.fileContainerLayout);
+        gestureOverlayView = findViewById(R.id.gesturesOverlay);
+
+        // Initialize variables
+        mediaController = new MediaController(MainActivity.this);
+    }
+
+    /**
+     * Initializes the custom gestures library and listeners.
+     */
+    private void initializeCustomGestures() {
+        gestureOverlayView.addOnGesturePerformedListener(this);
+        gestureLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
+        if (!gestureLib.load()) {
+            finish();
         }
     }
 
@@ -86,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                 mediaController.setAnchorView(videoView); // anchor the media controls
                 progressBar.setVisibility(View.GONE); // hide progress bar
                 videoView.seekTo(1); // create thumbnail
-                videoView.pause(); // video starts instantly playing without this
+                videoView.pause(); // video plays instantly without this
 
                 setSourceTextViewColors();
             }
@@ -142,17 +201,22 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, READ_REQUEST_CODE);
     }
 
+    /**
+     * Loads the video into the videoView from the specified storage path
+     */
     public void onClickLoadFile(View view) {
         fileSource = FileSource.LOCAL;
-        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE); // shows progress bar while video loads
         videoView.setVideoURI(Uri.parse(filePathTextView.getText().toString()));
     }
 
+    /**
+     * Loads the video into the videoView from the specified url
+     */
     public void onClickLoadUrl(View view) {
         fileSource = FileSource.URL;
-        progressBar.setVisibility(View.VISIBLE);
-        String urlInput = urlPathTextView.getText().toString();
-        videoView.setVideoURI(Uri.parse(urlInput));
+        progressBar.setVisibility(View.VISIBLE); // shows progress bar while video loads
+        videoView.setVideoURI(Uri.parse(urlPathTextView.getText().toString()));
     }
 
     /**
@@ -161,7 +225,6 @@ public class MainActivity extends AppCompatActivity {
      */
     public void onClickFullscreen(View view) {
         Intent intent = new Intent(this, FullscreenActivity.class);
-
 
 
         startActivity(intent);

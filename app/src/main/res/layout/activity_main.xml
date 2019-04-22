@@ -25,10 +25,7 @@
             android:id="@+id/videoContainerLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintBottom_toTopOf="@+id/urlContainerLayout"
-            app:layout_constraintEnd_toEndOf="@+id/urlContainerLayout"
-            app:layout_constraintStart_toStartOf="@+id/urlContainerLayout"
-            app:layout_constraintTop_toTopOf="@+id/urlContainerLayout">
+            android:background="@android:color/black">
 
             <VideoView
                 android:id="@+id/videoView"
@@ -49,7 +46,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_gravity="end"
-                android:background="@color/colorHighligh"
+                android:background="@color/colorHighlight"
                 android:contentDescription="@string/todo"
                 android:onClick="onClickFullscreen"
                 android:padding="0dp"

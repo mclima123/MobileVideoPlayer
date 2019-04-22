@@ -1,12 +1,9 @@
 package com.example.mobilevideoplayer;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.gesture.Gesture;
-import android.gesture.GestureLibraries;
-import android.gesture.GestureLibrary;
 import android.gesture.GestureOverlayView;
-import android.gesture.Prediction;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -14,15 +11,14 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import java.util.ArrayList;
-
-public class MainActivity extends AppCompatActivity implements GestureOverlayView.OnGesturePerformedListener {
+public class MainActivity extends AppCompatActivity {
 
     /**
      * Software Architecture for User Interfaces project
@@ -40,12 +36,12 @@ public class MainActivity extends AppCompatActivity implements GestureOverlayVie
     private TextView filePathTextView;
     private TextView urlPathTextView;
     private VideoView videoView;
+    private FrameLayout frameLayout;
     private ProgressBar progressBar;
     private MediaController mediaController;
     private ConstraintLayout urlBackground;
     private ConstraintLayout fileBackground;
     private GestureOverlayView gestureOverlayView;
-    private GestureLibrary gestureLib;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements GestureOverlayVie
         initializeVariables();
         setVideoViewListeners();
         setUrlTextViewListener();
-        initializeCustomGestures();
+        setGesturesListeners();
     }
 
     @Override
@@ -63,8 +59,10 @@ public class MainActivity extends AppCompatActivity implements GestureOverlayVie
         if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             if (resultData != null) {
                 Uri uri = resultData.getData();
-                filePathTextView.setText(uri.toString());
-                filePathTextView.setTextColor(Color.BLACK);
+                if (uri != null) {
+                    filePathTextView.setText(uri.toString());
+                    filePathTextView.setTextColor(Color.BLACK);
+                }
             }
         }
     }
@@ -81,29 +79,11 @@ public class MainActivity extends AppCompatActivity implements GestureOverlayVie
         Toast.makeText(this, "main activity resumed", Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
-        ArrayList<Prediction> predictions = gestureLib.recognize(gesture);
-
-        for (Prediction prediction : predictions) {
-            if (prediction.score > 1.0) {
-                Toast.makeText(this, prediction.name, Toast.LENGTH_SHORT).show();
-
-                switch (prediction.name) {
-                    case "restart": // circular gesture sets the timestamp to 0s
-                        videoView.seekTo(0);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    }
-
     /**
      * Finds the UI views and initializes variables.
      */
     private void initializeVariables() {
+        // Find views
         filePathTextView = findViewById(R.id.mainActivityFileTextView);
         urlPathTextView = findViewById(R.id.urlTextView);
         videoView = findViewById(R.id.videoView);
@@ -111,20 +91,21 @@ public class MainActivity extends AppCompatActivity implements GestureOverlayVie
         urlBackground = findViewById(R.id.urlContainerLayout);
         fileBackground = findViewById(R.id.fileContainerLayout);
         gestureOverlayView = findViewById(R.id.gesturesOverlay);
+        frameLayout = findViewById(R.id.videoContainerLayout);
 
         // Initialize variables
         mediaController = new MediaController(MainActivity.this);
     }
 
     /**
-     * Initializes the custom gestures library and listeners.
+     * Initializes the normal and custom gestures listeners.
      */
-    private void initializeCustomGestures() {
-        gestureOverlayView.addOnGesturePerformedListener(this);
-        gestureLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
-        if (!gestureLib.load()) {
-            finish();
-        }
+    @SuppressLint("ClickableViewAccessibility")
+    private void setGesturesListeners() {
+        gestureOverlayView.addOnGesturePerformedListener(new CustomGesturesListener(this,
+                videoView));
+
+        gestureOverlayView.setOnTouchListener(new SwipeGesturesListener(this, videoView));
     }
 
     /**
@@ -142,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements GestureOverlayVie
             @Override
             public void onPrepared(MediaPlayer mp) {
                 videoView.setMediaController(mediaController);
-                mediaController.setAnchorView(videoView); // anchor the media controls
+                mediaController.setAnchorView(frameLayout); // anchor the media controls
                 progressBar.setVisibility(View.GONE); // hide progress bar
                 videoView.seekTo(1); // create thumbnail
                 videoView.pause(); // video plays instantly without this
@@ -238,10 +219,10 @@ public class MainActivity extends AppCompatActivity implements GestureOverlayVie
     private void setSourceTextViewColors() {
         if (fileSource == FileSource.LOCAL) {
             urlBackground.setBackgroundColor(Color.TRANSPARENT);
-            fileBackground.setBackgroundColor(getResources().getColor(R.color.colorHighligh));
+            fileBackground.setBackgroundColor(getResources().getColor(R.color.colorHighlight));
         } else {
             fileBackground.setBackgroundColor(Color.TRANSPARENT);
-            urlBackground.setBackgroundColor(getResources().getColor(R.color.colorHighligh));
+            urlBackground.setBackgroundColor(getResources().getColor(R.color.colorHighlight));
         }
     }
 }

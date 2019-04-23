@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 videoView.setMediaController(mediaController);
                 mediaController.setAnchorView(gestureOverlayView); // anchor the media controls
                 progressBar.setVisibility(View.GONE); // hide progress bar
+                videoView.start(); // sometimes thumbnail doesn't show without this
                 videoView.seekTo(1); // create thumbnail
                 videoView.pause(); // video plays instantly without this
 
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Saves the current state(video uri and timestamp, etc) and starts new activity.
+     * Handles click on fullscreen button.
      */
     public void onClickFullscreen(View view) {
         if (!isFullscreen) {
@@ -207,15 +208,22 @@ public class MainActivity extends AppCompatActivity {
      * Sets the background of the video source that is currently loaded.
      */
     private void setSourceTextViewColors() {
+        // if video source is local storage, highlight only local storage
         if (fileSource == FileSource.LOCAL) {
             urlBackground.setBackgroundColor(Color.TRANSPARENT);
             fileBackground.setBackgroundResource(R.drawable.rounded_corners_background_padding);
-        } else {
+        }
+        // else, highlight only url fields
+        else {
             fileBackground.setBackgroundColor(Color.TRANSPARENT);
             urlBackground.setBackgroundResource(R.drawable.rounded_corners_background_padding);
         }
     }
 
+    /**
+     * Enters fullscreen.
+     * Rotates screen to landscape if video is wider, stays in portrait otherwise.
+     */
     private void enterFullscreen(float ratio) {
         fullscreenButton.setImageResource(R.drawable.fullscreen_exit_icon);
 
@@ -233,9 +241,12 @@ public class MainActivity extends AppCompatActivity {
         isFullscreen = true;
     }
 
+    /**
+     * Exits fullscreen.
+     */
     private void exitFullscreen() {
-        fullscreenButton.setImageResource(R.drawable.fullscreen_icon);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        fullscreenButton.setImageResource(R.drawable.fullscreen_icon); // sets appropriate icon
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //sets portrait orientation
 
         //fazer coisas
         //fazer coisas

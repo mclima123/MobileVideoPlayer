@@ -3,6 +3,7 @@ package com.example.mobilevideoplayer;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.gesture.GestureOverlayView;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -11,11 +12,10 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,16 +32,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private FileSource fileSource;
+    private boolean isFullscreen = false;
     private static final int READ_REQUEST_CODE = 42;
     private TextView filePathTextView;
     private TextView urlPathTextView;
     private VideoView videoView;
-    private FrameLayout frameLayout;
     private ProgressBar progressBar;
     private MediaController mediaController;
     private ConstraintLayout urlBackground;
     private ConstraintLayout fileBackground;
     private GestureOverlayView gestureOverlayView;
+    private ImageButton fullscreenButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,22 +62,10 @@ public class MainActivity extends AppCompatActivity {
                 Uri uri = resultData.getData();
                 if (uri != null) {
                     filePathTextView.setText(uri.toString());
-                    filePathTextView.setTextColor(Color.BLACK);
+                    filePathTextView.setTextColor(Color.WHITE);
                 }
             }
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Toast.makeText(this, "main activity paused", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Toast.makeText(this, "main activity resumed", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -84,17 +73,17 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initializeVariables() {
         // Find views
-        filePathTextView = findViewById(R.id.mainActivityFileTextView);
-        urlPathTextView = findViewById(R.id.urlTextView);
-        videoView = findViewById(R.id.videoView);
-        progressBar = findViewById(R.id.videoViewProgressBar);
-        urlBackground = findViewById(R.id.urlContainerLayout);
-        fileBackground = findViewById(R.id.fileContainerLayout);
-        gestureOverlayView = findViewById(R.id.gesturesOverlay);
-        frameLayout = findViewById(R.id.videoContainerLayout);
+        filePathTextView = findViewById(R.id.file_text_view);
+        urlPathTextView = findViewById(R.id.url_text_view);
+        videoView = findViewById(R.id.video_view);
+        progressBar = findViewById(R.id.video_view_progress_bar);
+        urlBackground = findViewById(R.id.url_container_layout);
+        fileBackground = findViewById(R.id.file_container_layout);
+        gestureOverlayView = findViewById(R.id.gestures_overlay);
+        fullscreenButton = findViewById(R.id.fullscreen_button);
 
         // Initialize variables
-        mediaController = new MediaController(MainActivity.this);
+        mediaController = new MediaController(this);
     }
 
     /**
@@ -123,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 videoView.setMediaController(mediaController);
-                mediaController.setAnchorView(frameLayout); // anchor the media controls
+                mediaController.setAnchorView(gestureOverlayView); // anchor the media controls
                 progressBar.setVisibility(View.GONE); // hide progress bar
                 videoView.seekTo(1); // create thumbnail
                 videoView.pause(); // video plays instantly without this
@@ -177,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT)
                 .addCategory(Intent.CATEGORY_OPENABLE)
-                .setType("video/*"); //shows only video files
+                .setType("video/*"); //shows only supported video files
 
         startActivityForResult(intent, READ_REQUEST_CODE);
     }
@@ -201,14 +190,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * TODO
      * Saves the current state(video uri and timestamp, etc) and starts new activity.
      */
     public void onClickFullscreen(View view) {
-        Intent intent = new Intent(this, FullscreenActivity.class);
-
-
-        startActivity(intent);
+        if (!isFullscreen) {
+            float ratio = (float) videoView.getWidth() / videoView.getHeight();
+            enterFullscreen(ratio);
+        } else {
+            exitFullscreen();
+        }
     }
 
     // endregion
@@ -219,10 +209,38 @@ public class MainActivity extends AppCompatActivity {
     private void setSourceTextViewColors() {
         if (fileSource == FileSource.LOCAL) {
             urlBackground.setBackgroundColor(Color.TRANSPARENT);
-            fileBackground.setBackgroundColor(getResources().getColor(R.color.colorHighlight));
+            fileBackground.setBackgroundResource(R.drawable.rounded_corners_background_padding);
         } else {
             fileBackground.setBackgroundColor(Color.TRANSPARENT);
-            urlBackground.setBackgroundColor(getResources().getColor(R.color.colorHighlight));
+            urlBackground.setBackgroundResource(R.drawable.rounded_corners_background_padding);
         }
+    }
+
+    private void enterFullscreen(float ratio) {
+        fullscreenButton.setImageResource(R.drawable.fullscreen_exit_icon);
+
+        // is video landscape?
+        if (ratio > 1) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
+        //fazer coisas
+        //fazer coisas
+        //fazer coisas
+
+        isFullscreen = true;
+    }
+
+    private void exitFullscreen() {
+        fullscreenButton.setImageResource(R.drawable.fullscreen_icon);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        //fazer coisas
+        //fazer coisas
+        //fazer coisas
+
+        isFullscreen = false;
     }
 }

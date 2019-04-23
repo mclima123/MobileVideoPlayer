@@ -4,37 +4,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context=".MainActivity">
 
     <android.gesture.GestureOverlayView
-        android:id="@+id/gesturesOverlay"
+        android:id="@+id/gestures_overlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:background="@android:color/black"
         android:eventsInterceptionEnabled="false"
         android:gestureStrokeType="multiple"
-        app:layout_constraintBottom_toTopOf="@+id/urlContainerLayout"
+        app:layout_constraintBottom_toTopOf="@+id/url_container_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <FrameLayout
-            android:id="@+id/videoContainerLayout"
+            android:id="@+id/video_container_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/black">
+            android:layout_height="match_parent">
 
             <VideoView
-                android:id="@+id/videoView"
+                android:id="@+id/video_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center" />
 
             <ProgressBar
-                android:id="@+id/videoViewProgressBar"
+                android:id="@+id/video_view_progress_bar"
                 style="?android:attr/progressBarStyle"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
@@ -42,22 +40,22 @@
                 android:visibility="invisible" />
 
             <ImageButton
-                android:id="@+id/fullscreenButton"
+                android:id="@+id/fullscreen_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_gravity="end"
-                android:background="@color/colorHighlight"
+                android:background="@color/colorHighlightGray"
                 android:contentDescription="@string/todo"
                 android:onClick="onClickFullscreen"
-                android:padding="0dp"
                 android:scaleType="fitCenter"
                 android:tint="@android:color/background_light"
                 app:srcCompat="@drawable/fullscreen_icon" />
+
         </FrameLayout>
     </android.gesture.GestureOverlayView>
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/urlContainerLayout"
+        android:id="@+id/url_container_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -69,30 +67,26 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <EditText
-            android:id="@+id/urlTextView"
+            android:id="@+id/url_text_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:ems="10"
             android:hint="@string/url_source"
             android:inputType="textUri"
-            android:textColor="@android:color/black"
             android:textColorLink="@color/colorAccent"
-            app:layout_constraintBottom_toBottomOf="@+id/urlPlayButton"
-            app:layout_constraintEnd_toStartOf="@+id/urlPlayButton"
+            app:layout_constraintBottom_toBottomOf="@+id/url_play_button"
+            app:layout_constraintEnd_toStartOf="@+id/url_play_button"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/urlPlayButton"
+            app:layout_constraintTop_toTopOf="@+id/url_play_button"
             tools:ignore="Autofill" />
 
         <ImageButton
-            android:id="@+id/urlPlayButton"
+            android:id="@+id/url_play_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginBottom="0dp"
-            android:backgroundTint="@color/colorPrimary"
+            android:background="@drawable/rounded_corners_button"
             android:contentDescription="@string/todo"
             android:onClick="onClickLoadUrl"
             android:tint="@android:color/background_light"
@@ -110,12 +104,12 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="?android:attr/listDivider"
-        app:layout_constraintBottom_toTopOf="@+id/fileContainerLayout"
+        app:layout_constraintBottom_toTopOf="@+id/file_container_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/fileContainerLayout"
+        android:id="@+id/file_container_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -128,54 +122,48 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <HorizontalScrollView
-            android:id="@+id/horizontalScrollView"
+            android:id="@+id/horizontal_scroll_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginEnd="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/fileSearchButton"
+            app:layout_constraintEnd_toStartOf="@+id/file_search_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/mainActivityFileTextView"
+                android:id="@+id/file_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="4dp"
                 android:gravity="bottom"
+                android:hint="@string/no_file_selected"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:singleLine="true"
-                android:text="@string/no_file_selected"
-                android:textColor="#999999"
                 android:textSize="18sp" />
         </HorizontalScrollView>
 
         <ImageButton
-            android:id="@+id/fileSearchButton"
+            android:id="@+id/file_search_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginTop="0dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="0dp"
-            android:backgroundTint="@color/colorPrimary"
+            android:background="@drawable/rounded_corners_button"
             android:contentDescription="@string/todo"
             android:onClick="onClickFileSearch"
             android:tint="@android:color/background_light"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/filePlayButton"
+            app:layout_constraintEnd_toStartOf="@+id/file_play_button"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/folder_icon" />
 
         <ImageButton
-            android:id="@+id/filePlayButton"
+            android:id="@+id/file_play_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginBottom="0dp"
-            android:backgroundTint="@color/colorPrimary"
+            android:background="@drawable/rounded_corners_button"
             android:contentDescription="@string/todo"
             android:onClick="onClickLoadFile"
             android:tint="@android:color/background_light"

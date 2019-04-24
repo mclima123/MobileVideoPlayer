@@ -1,21 +1,30 @@
 package com.example.mobilevideoplayer;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.gesture.Gesture;
 import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
 import android.gesture.GestureOverlayView;
 import android.gesture.Prediction;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import java.util.ArrayList;
 
-public class CustomGesturesListener implements GestureOverlayView.OnGesturePerformedListener {
+public class CustomGesturesListener implements
+        GestureOverlayView.OnGesturePerformedListener,
+        View.OnTouchListener {
 
     private Activity activity;
     private VideoView videoView;
     private GestureLibrary gestureLibrary;
+    private static final int MIN_DISTANCE = 200;
+    private float downX, downY;
+    private static final long doubleTapInterval = 200;
+    private long prevTapTime = 0;
 
     public CustomGesturesListener(Activity activity, VideoView videoView) {
         this.activity = activity;
@@ -32,7 +41,8 @@ public class CustomGesturesListener implements GestureOverlayView.OnGesturePerfo
         ArrayList<Prediction> predictions = gestureLibrary.recognize(gesture);
 
         for (Prediction prediction : predictions) {
-            if (prediction.score > 1.0) {
+            // increased accuracy level, so this gesture doesn't get detected on accident.
+            if (prediction.score > 4.0) {
                 Toast.makeText(activity, prediction.name, Toast.LENGTH_SHORT).show();
 
                 switch (prediction.name) {
@@ -44,5 +54,118 @@ public class CustomGesturesListener implements GestureOverlayView.OnGesturePerfo
                 }
             }
         }
+    }
+
+    /**
+     * Forwards video 15s on right swipe
+     */
+    private void onRightSwipe() {
+        int currentTimestamp = videoView.getCurrentPosition();
+
+        if (currentTimestamp + 15000 < videoView.getDuration()) {
+            videoView.seekTo(currentTimestamp + 15000);
+        } else {
+            videoView.seekTo(videoView.getDuration());
+        }
+
+        Toast.makeText(activity, "right swipe", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Backwards video 15s on right swipe
+     */
+    private void onLeftSwipe() {
+        int currentTimestamp = videoView.getCurrentPosition();
+
+        if (currentTimestamp - 15000 > 0) {
+            videoView.seekTo(currentTimestamp - 15000);
+        } else {
+            videoView.seekTo(1);
+        }
+
+        Toast.makeText(activity, "left swipe", Toast.LENGTH_SHORT).show();
+    }
+
+    private void onDownSwipe() {
+        Toast.makeText(activity, "down swipe", Toast.LENGTH_SHORT).show();
+    }
+
+    private void onUpSwipe() {
+        Toast.makeText(activity, "up swipe", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Plays/pauses the video on double tap.
+     */
+    private void onDoubleTap() {
+        if (videoView.isPlaying())
+            videoView.pause();
+        else
+            videoView.start();
+
+        Toast.makeText(activity, "double tap", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Detects onTouch event (press and release) and what swipe direction.
+     */
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                if (System.currentTimeMillis() - prevTapTime <= doubleTapInterval) {
+                    onDoubleTap();
+                    return true;
+                }
+                downX = event.getX();
+                downY = event.getY();
+                prevTapTime = System.currentTimeMillis();
+                return true;
+            }
+            case MotionEvent.ACTION_UP: {
+                float upX = event.getX();
+                float upY = event.getY();
+
+                float deltaX = upX - downX;
+                float deltaY = downY - upY;
+
+                // swipe horizontal?
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    if (Math.abs(deltaX) > MIN_DISTANCE) {
+                        // left or right
+                        if (deltaX > 0) {
+                            this.onRightSwipe();
+                            return true;
+                        }
+                        if (deltaX < 0) {
+                            this.onLeftSwipe();
+                            return true;
+                        }
+                    } else {
+                        return false; // We don't consume the event
+                    }
+                }
+                // swipe vertical?
+                else {
+                    if (Math.abs(deltaY) > MIN_DISTANCE) {
+                        // top or down
+                        if (deltaY < 0) {
+                            this.onDownSwipe();
+                            return true;
+                        }
+                        if (deltaY > 0) {
+                            this.onUpSwipe();
+                            return true;
+                        }
+                    } else {
+                        return false; // We don't consume the event
+                    }
+                }
+
+                return true;
+            }
+        }
+        return false;
     }
 }

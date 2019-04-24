@@ -5,31 +5,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
+    android:id="@+id/mainConstraintLayout"
     tools:context=".MainActivity">
 
-    <android.gesture.GestureOverlayView
-        android:id="@+id/gestures_overlay"
+    <FrameLayout
+        android:id="@+id/video_container_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         android:background="@android:color/black"
-        android:eventsInterceptionEnabled="false"
-        android:gestureStrokeType="multiple"
+        android:translationZ="1dp"
         app:layout_constraintBottom_toTopOf="@+id/url_container_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <FrameLayout
-            android:id="@+id/video_container_layout"
+        <android.gesture.GestureOverlayView
+            android:id="@+id/gestures_overlay"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:eventsInterceptionEnabled="false"
+            android:gestureStrokeType="multiple"
+            android:translationZ="2dp">
 
             <VideoView
                 android:id="@+id/video_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                android:translationZ="3dp" />
 
             <ProgressBar
                 android:id="@+id/video_view_progress_bar"
@@ -37,6 +41,7 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
+                android:translationZ="4dp"
                 android:visibility="invisible" />
 
             <ImageButton
@@ -49,10 +54,10 @@
                 android:onClick="onClickFullscreen"
                 android:scaleType="fitCenter"
                 android:tint="@android:color/background_light"
+                android:translationZ="4dp"
                 app:srcCompat="@drawable/fullscreen_icon" />
-
-        </FrameLayout>
-    </android.gesture.GestureOverlayView>
+        </android.gesture.GestureOverlayView>
+    </FrameLayout>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/url_container_layout"

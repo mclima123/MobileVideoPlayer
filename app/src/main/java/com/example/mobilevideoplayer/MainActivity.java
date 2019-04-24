@@ -10,13 +10,17 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.VideoView;
+
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,6 +47,11 @@ public class MainActivity extends AppCompatActivity {
     private ConstraintLayout fileBackground;
     private GestureOverlayView gestureOverlayView;
     private ImageButton fullscreenButton;
+    private FrameLayout frameLayout;
+    private boolean isVideoReady = false;
+    private View decorView;
+    private ConstraintLayout constraintLayout;
+    private ConstraintSet constraintSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +62,20 @@ public class MainActivity extends AppCompatActivity {
         setVideoViewListeners();
         setUrlTextViewListener();
         setGesturesListeners();
+
+        decorView.setOnSystemUiVisibilityChangeListener
+                (new View.OnSystemUiVisibilityChangeListener() {
+                    @Override
+                    public void onSystemUiVisibilityChange(int visibility) {
+                        // Note that system bars will only be "visible" if none of the
+                        // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
+                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                            decorView.requestLayout();
+                        } else {
+                            decorView.requestLayout();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -81,20 +104,25 @@ public class MainActivity extends AppCompatActivity {
         fileBackground = findViewById(R.id.file_container_layout);
         gestureOverlayView = findViewById(R.id.gestures_overlay);
         fullscreenButton = findViewById(R.id.fullscreen_button);
+        frameLayout = findViewById(R.id.video_container_layout);
+        constraintLayout = findViewById(R.id.mainConstraintLayout);
 
         // Initialize variables
         mediaController = new MediaController(this);
+        decorView = getWindow().getDecorView();
+        constraintSet = new ConstraintSet();
+        constraintSet.clone(constraintLayout); // cache portrait layout constraints
     }
 
     /**
-     * Initializes the normal and custom gestures listeners.
+     * Initializes the custom gestures listeners.
      */
     @SuppressLint("ClickableViewAccessibility")
     private void setGesturesListeners() {
-        gestureOverlayView.addOnGesturePerformedListener(new CustomGesturesListener(this,
-                videoView));
+        CustomGesturesListener customGesturesListener = new CustomGesturesListener(this, videoView);
 
-        gestureOverlayView.setOnTouchListener(new SwipeGesturesListener(this, videoView));
+        gestureOverlayView.addOnGesturePerformedListener(customGesturesListener); // custom gestures
+        gestureOverlayView.setOnTouchListener(customGesturesListener); // double tap and swipes
     }
 
     /**
@@ -118,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
                 videoView.seekTo(1); // create thumbnail
                 videoView.pause(); // video plays instantly without this
 
+                isVideoReady = true;
                 setSourceTextViewColors();
             }
         });
@@ -138,6 +167,9 @@ public class MainActivity extends AppCompatActivity {
                 videoView.setVideoURI(null); // prevents error dialog from showing multiple times
                 urlBackground.setBackgroundColor(Color.TRANSPARENT); // no video source selected
                 fileBackground.setBackgroundColor(Color.TRANSPARENT); // no video source selected
+                isVideoReady = false;
+                if (isFullscreen) exitFullscreen();
+
                 return false;
             }
         });
@@ -167,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT)
                 .addCategory(Intent.CATEGORY_OPENABLE)
-                .setType("video/*"); //shows only supported video files
+                .setType("video/*"); //shows only video files
 
         startActivityForResult(intent, READ_REQUEST_CODE);
     }
@@ -194,15 +226,77 @@ public class MainActivity extends AppCompatActivity {
      * Handles click on fullscreen button.
      */
     public void onClickFullscreen(View view) {
-        if (!isFullscreen) {
+        if (!isFullscreen && isVideoReady) {
             float ratio = (float) videoView.getWidth() / videoView.getHeight();
             enterFullscreen(ratio);
-        } else {
+        } else if (isFullscreen) {
             exitFullscreen();
         }
     }
 
     // endregion
+
+    /**
+     * Enters fullscreen.
+     * Rotates screen to landscape if video is wider, stays in portrait otherwise.
+     */
+    private void enterFullscreen(float ratio) {
+        //hideSystemUI();
+        fullscreenButton.setImageResource(R.drawable.fullscreen_exit_icon);
+
+        // is video landscape?
+        if (ratio > 1) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
+        setVideoFullscreen();
+        isFullscreen = true;
+    }
+
+    /**
+     * Exits fullscreen.
+     */
+    private void exitFullscreen() {
+        //showSystemUI();
+        fullscreenButton.setImageResource(R.drawable.fullscreen_icon); // sets appropriate icon
+
+        // if screen is in landscape, rotate to portrait
+        if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
+        setVideoNormalScreen();
+        isFullscreen = false;
+    }
+
+    /**
+     * Sets the frameLayout containing the video to fill the screen.
+     * https://stackoverflow.com/questions/12728255/in-android-how-do-i-set-margins-in-dp-programmatically
+     * Hides the action bar.
+     * https://stackoverflow.com/questions/31152069/app-crashes-on-hiding-actionbar
+     */
+    private void setVideoFullscreen() {
+        Objects.requireNonNull(getSupportActionBar()).hide(); // avoids potential exception
+        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.MATCH_PARENT
+        );
+        params.setMargins(0, 0, 0, 0);
+        frameLayout.setLayoutParams(params);
+    }
+
+    /**
+     * Sets the frameLayout containing the video to its normal size
+     * Restores previous layout.
+     * https://stackoverflow.com/questions/45263159/constraintlayout-change-constraints-programmatically
+     */
+    private void setVideoNormalScreen() {
+        Objects.requireNonNull(getSupportActionBar()).show(); // avoids potential exception
+
+        constraintSet.applyTo(constraintLayout); // restore previous layout constraints
+    }
 
     /**
      * Sets the background of the video source that is currently loaded.
@@ -221,37 +315,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Enters fullscreen.
-     * Rotates screen to landscape if video is wider, stays in portrait otherwise.
+     * Hides system UI, making activity fullscreen.
+     * https://developer.android.com/training/system-ui/immersive
      */
-    private void enterFullscreen(float ratio) {
-        fullscreenButton.setImageResource(R.drawable.fullscreen_exit_icon);
-
-        // is video landscape?
-        if (ratio > 1) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-
-        //fazer coisas
-        //fazer coisas
-        //fazer coisas
-
-        isFullscreen = true;
+    private void hideSystemUI() {
+        // Enables regular immersive mode.
+        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
     /**
-     * Exits fullscreen.
+     * Shows the system bars by removing all the flags.
+     * except for the ones that make the content appear under the system bars.
+     * https://developer.android.com/training/system-ui/immersive
      */
-    private void exitFullscreen() {
-        fullscreenButton.setImageResource(R.drawable.fullscreen_icon); // sets appropriate icon
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //sets portrait orientation
-
-        //fazer coisas
-        //fazer coisas
-        //fazer coisas
-
-        isFullscreen = false;
+    private void showSystemUI() {
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_VISIBLE);
     }
 }

@@ -62,20 +62,6 @@ public class MainActivity extends AppCompatActivity {
         setVideoViewListeners();
         setUrlTextViewListener();
         setGesturesListeners();
-
-        decorView.setOnSystemUiVisibilityChangeListener
-                (new View.OnSystemUiVisibilityChangeListener() {
-                    @Override
-                    public void onSystemUiVisibilityChange(int visibility) {
-                        // Note that system bars will only be "visible" if none of the
-                        // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
-                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                            decorView.requestLayout();
-                        } else {
-                            decorView.requestLayout();
-                        }
-                    }
-                });
     }
 
     @Override

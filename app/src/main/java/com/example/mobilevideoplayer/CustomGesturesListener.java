@@ -2,11 +2,13 @@ package com.example.mobilevideoplayer;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.gesture.Gesture;
 import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
 import android.gesture.GestureOverlayView;
 import android.gesture.Prediction;
+import android.media.AudioManager;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -18,22 +20,22 @@ public class CustomGesturesListener implements
         GestureOverlayView.OnGesturePerformedListener,
         View.OnTouchListener {
 
-    private Activity activity;
     private VideoView videoView;
     private GestureLibrary gestureLibrary;
-    private static final int MIN_DISTANCE = 200;
+    private static final int MIN_DISTANCE = 200; // minimum distance to consider a swipe
     private float downX, downY;
-    private static final long doubleTapInterval = 200;
+    private static final long doubleTapInterval = 200; // interval to detect double tap
     private long prevTapTime = 0;
+    private AudioManager audioManager;
 
     public CustomGesturesListener(Activity activity, VideoView videoView) {
-        this.activity = activity;
-        this.videoView = videoView;
-
         gestureLibrary = GestureLibraries.fromRawResource(activity, R.raw.gestures);
         if (!gestureLibrary.load()) {
             activity.finish();
         }
+
+        this.videoView = videoView;
+        audioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
     }
 
     @Override
@@ -43,7 +45,7 @@ public class CustomGesturesListener implements
         for (Prediction prediction : predictions) {
             // increased accuracy level, so this gesture doesn't get detected on accident.
             if (prediction.score > 4.0) {
-                Toast.makeText(activity, prediction.name, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(activity, prediction.name, Toast.LENGTH_SHORT).show();
 
                 switch (prediction.name) {
                     case "restart": // circular gesture sets the timestamp to 0s
@@ -57,7 +59,7 @@ public class CustomGesturesListener implements
     }
 
     /**
-     * Forwards video 15s on right swipe
+     * Forwards video 15s on right swipe.
      */
     private void onRightSwipe() {
         int currentTimestamp = videoView.getCurrentPosition();
@@ -68,11 +70,11 @@ public class CustomGesturesListener implements
             videoView.seekTo(videoView.getDuration());
         }
 
-        Toast.makeText(activity, "right swipe", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(activity, "right swipe", Toast.LENGTH_SHORT).show();
     }
 
     /**
-     * Backwards video 15s on right swipe
+     * Backwards video 15s on right swipe.
      */
     private void onLeftSwipe() {
         int currentTimestamp = videoView.getCurrentPosition();
@@ -83,15 +85,28 @@ public class CustomGesturesListener implements
             videoView.seekTo(1);
         }
 
-        Toast.makeText(activity, "left swipe", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(activity, "left swipe", Toast.LENGTH_SHORT).show();
     }
 
-    private void onDownSwipe() {
-        Toast.makeText(activity, "down swipe", Toast.LENGTH_SHORT).show();
-    }
-
+    /**
+     * Decreases media volume on up swipe.
+     */
     private void onUpSwipe() {
-        Toast.makeText(activity, "up swipe", Toast.LENGTH_SHORT).show();
+        audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+
+        //Toast.makeText(activity, "up swipe", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Decreases media volume on down swipe.
+     */
+    private void onDownSwipe() {
+        audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+
+
+        //Toast.makeText(activity, "down swipe", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -103,11 +118,12 @@ public class CustomGesturesListener implements
         else
             videoView.start();
 
-        Toast.makeText(activity, "double tap", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(activity, "double tap", Toast.LENGTH_SHORT).show();
     }
 
     /**
      * Detects onTouch event (press and release) and what swipe direction.
+     * Detects double tap.
      */
     @SuppressLint("ClickableViewAccessibility")
     @Override

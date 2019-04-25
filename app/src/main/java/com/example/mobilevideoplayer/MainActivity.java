@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FileSource fileSource;
     private boolean isFullscreen = false;
+    private boolean isVideoReady = false;
     private static final int READ_REQUEST_CODE = 42;
     private TextView filePathTextView;
     private TextView urlPathTextView;
@@ -48,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     private GestureOverlayView gestureOverlayView;
     private ImageButton fullscreenButton;
     private FrameLayout frameLayout;
-    private boolean isVideoReady = false;
     private View decorView;
     private ConstraintLayout constraintLayout;
     private ConstraintSet constraintSet;
@@ -300,6 +300,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    // region hide system UI - TODO
+
     /**
      * Hides system UI, making activity fullscreen.
      * https://developer.android.com/training/system-ui/immersive
@@ -326,4 +329,6 @@ public class MainActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_VISIBLE);
     }
+
+    // endregion
 }

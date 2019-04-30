@@ -23,6 +23,7 @@ public class CustomGesturesListener implements
     private VideoView videoView;
     private GestureLibrary gestureLibrary;
     private static final int MIN_DISTANCE = 200; // minimum distance to consider a swipe
+    private static final int videoSeekJump = 15000; // 15s jumps
     private float downX, downY;
     private static final long doubleTapInterval = 200; // interval to detect double tap
     private long prevTapTime = 0;
@@ -64,8 +65,8 @@ public class CustomGesturesListener implements
     private void onRightSwipe() {
         int currentTimestamp = videoView.getCurrentPosition();
 
-        if (currentTimestamp + 15000 < videoView.getDuration()) {
-            videoView.seekTo(currentTimestamp + 15000);
+        if (currentTimestamp + videoSeekJump < videoView.getDuration()) {
+            videoView.seekTo(currentTimestamp + videoSeekJump);
         } else {
             videoView.seekTo(videoView.getDuration());
         }
@@ -79,8 +80,8 @@ public class CustomGesturesListener implements
     private void onLeftSwipe() {
         int currentTimestamp = videoView.getCurrentPosition();
 
-        if (currentTimestamp - 15000 > 0) {
-            videoView.seekTo(currentTimestamp - 15000);
+        if (currentTimestamp - videoSeekJump > 0) {
+            videoView.seekTo(currentTimestamp - videoSeekJump);
         } else {
             videoView.seekTo(1);
         }
@@ -104,7 +105,6 @@ public class CustomGesturesListener implements
     private void onDownSwipe() {
         audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
                 AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
-
 
         //Toast.makeText(activity, "down swipe", Toast.LENGTH_SHORT).show();
     }

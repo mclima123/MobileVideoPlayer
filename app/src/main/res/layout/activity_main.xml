@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    android:id="@+id/mainConstraintLayout"
+    android:id="@+id/main_constraint_layout"
     tools:context=".MainActivity">
 
     <FrameLayout

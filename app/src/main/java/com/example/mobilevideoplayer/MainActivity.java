@@ -3,6 +3,7 @@ package com.example.mobilevideoplayer;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.gesture.GestureOverlayView;
 import android.graphics.Color;
@@ -52,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
     private View decorView;
     private ConstraintLayout constraintLayout;
     private ConstraintSet constraintSet;
+    private Intent serviceIntent;
+    private SensorBroadcastReceiver receiver;
+    private IntentFilter filter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +69,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onPause() {
+        // Unregister sensors to save battery
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    public void onResume() {
+        // Register the receiver when activity resumes
+        super.onResume();
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopService(serviceIntent); // ends the service so it doesn't run in the background
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        // On result from the file chooser activity
         if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             if (resultData != null) {
                 Uri uri = resultData.getData();
@@ -91,13 +116,21 @@ public class MainActivity extends AppCompatActivity {
         gestureOverlayView = findViewById(R.id.gestures_overlay);
         fullscreenButton = findViewById(R.id.fullscreen_button);
         frameLayout = findViewById(R.id.video_container_layout);
-        constraintLayout = findViewById(R.id.mainConstraintLayout);
+        constraintLayout = findViewById(R.id.main_constraint_layout);
 
         // Initialize variables
         mediaController = new MediaController(this);
         decorView = getWindow().getDecorView();
         constraintSet = new ConstraintSet();
         constraintSet.clone(constraintLayout); // cache portrait layout constraints
+
+        // Initialize sensors service
+        serviceIntent = new Intent(this, SensorService.class);
+        startService(serviceIntent);
+        filter = new IntentFilter();
+        filter.addAction("GET_PROXIMITY_GRAVITY_ACTION");
+        receiver = new SensorBroadcastReceiver(videoView);
+        registerReceiver(receiver, filter);
     }
 
     /**
@@ -156,6 +189,13 @@ public class MainActivity extends AppCompatActivity {
                 isVideoReady = false;
                 if (isFullscreen) exitFullscreen();
 
+                return false;
+            }
+        });
+
+        videoView.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+            @Override
+            public boolean onInfo(MediaPlayer mp, int what, int extra) {
                 return false;
             }
         });
@@ -225,17 +265,15 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Enters fullscreen.
      * Rotates screen to landscape if video is wider, stays in portrait otherwise.
+     * https://stackoverflow.com/questions/18268218/change-screen-orientation-programmatically-using-a-button
      */
     private void enterFullscreen(float ratio) {
         //hideSystemUI();
-        fullscreenButton.setImageResource(R.drawable.fullscreen_exit_icon);
+        fullscreenButton.setImageResource(R.drawable.fullscreen_exit_icon); //sets appropriate icon
 
         // is video landscape?
-        if (ratio > 1) {
+        if (ratio > 1)
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
 
         setVideoFullscreen();
         isFullscreen = true;
@@ -286,6 +324,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Sets the background of the video source that is currently loaded.
+     * Indicates to the user which source the video is from.
      */
     private void setSourceTextViewColors() {
         // if video source is local storage, highlight only local storage

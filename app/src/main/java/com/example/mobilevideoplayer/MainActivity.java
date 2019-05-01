@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
     private GestureOverlayView gestureOverlayView;
     private ImageButton fullscreenButton;
     private FrameLayout frameLayout;
-    private View decorView;
     private ConstraintLayout constraintLayout;
     private ConstraintSet constraintSet;
     private Intent serviceIntent;
@@ -87,9 +86,6 @@ public class MainActivity extends AppCompatActivity {
         // Initialize sensors service
         serviceIntent = new Intent(this, SensorService.class);
         startService(serviceIntent);
-        filter = new IntentFilter();
-        filter.addAction("GET_PROXIMITY_GRAVITY_ACTION");
-        receiver = new SensorBroadcastReceiver(videoView);
         registerReceiver(receiver, filter);
     }
 
@@ -130,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initializeVariables() {
         // Initialize custom toolbar
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
         // Find views
@@ -147,9 +143,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize variables
         mediaController = new MediaController(this);
-        decorView = getWindow().getDecorView();
         constraintSet = new ConstraintSet();
         constraintSet.clone(constraintLayout); // cache portrait layout constraints
+
+        // Sensors
+        filter = new IntentFilter();
+        filter.addAction("GET_PROXIMITY_GRAVITY_ACTION");
+        receiver = new SensorBroadcastReceiver(videoView);
     }
 
     /**
@@ -371,36 +371,4 @@ public class MainActivity extends AppCompatActivity {
             urlBackground.setBackgroundResource(R.drawable.rounded_corners_background_padding);
         }
     }
-
-
-    // region hide system UI - TODO
-
-    /**
-     * Hides system UI, making activity fullscreen.
-     * https://developer.android.com/training/system-ui/immersive
-     */
-    private void hideSystemUI() {
-        // Enables regular immersive mode.
-        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
-        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        decorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
-    }
-
-    /**
-     * Shows the system bars by removing all the flags.
-     * except for the ones that make the content appear under the system bars.
-     * https://developer.android.com/training/system-ui/immersive
-     */
-    private void showSystemUI() {
-        decorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_VISIBLE);
-    }
-
-    // endregion
 }

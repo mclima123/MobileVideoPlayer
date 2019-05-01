@@ -2,6 +2,7 @@ package com.example.mobilevideoplayer;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
@@ -13,6 +14,9 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -103,10 +107,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // create an action bar button
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.actions, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    // handle button activities
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_info) {
+            Dialog dialog = new Dialog(this);
+            dialog.setContentView(R.layout.dialog_info);
+            dialog.show();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     /**
      * Finds the UI views and initializes variables.
      */
     private void initializeVariables() {
+        // Initialize custom toolbar
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+
         // Find views
         filePathTextView = findViewById(R.id.file_text_view);
         urlPathTextView = findViewById(R.id.url_text_view);
@@ -257,6 +283,14 @@ public class MainActivity extends AppCompatActivity {
         } else if (isFullscreen) {
             exitFullscreen();
         }
+    }
+
+    /**
+     * Stops the video, if it's ready. (Pause and back to start)
+     */
+    public void onClickStop(View view) {
+        videoView.pause();
+        videoView.seekTo(0);
     }
 
     // endregion

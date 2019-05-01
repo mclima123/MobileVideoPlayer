@@ -76,7 +76,7 @@ public class SensorService extends Service {
             gravityZ = sensorEvent.values[2];
 
             // Check proximity sensor
-            if (proximity < 1 && gravityZ < -9.5) notifyPause();
+            if (proximity < 0.5 && gravityZ < -9.5) notifyPause();
         }
     }
 
@@ -87,7 +87,7 @@ public class SensorService extends Service {
             proximity = event.values[0];
 
             // Check proximity
-            if (gravityZ < -9.5 && proximity < 1) notifyPause();
+            if (gravityZ < -9.5 && proximity < 0.5) notifyPause();
         }
 
         @Override

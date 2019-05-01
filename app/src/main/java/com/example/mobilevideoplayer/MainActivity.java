@@ -14,6 +14,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.MediaController;
@@ -73,19 +74,19 @@ public class MainActivity extends AppCompatActivity {
         // Unregister sensors to save battery
         super.onPause();
         unregisterReceiver(receiver);
+        stopService(serviceIntent); // ends the service so it doesn't run in the background
     }
 
     @Override
     public void onResume() {
-        // Register the receiver when activity resumes
         super.onResume();
+        // Initialize sensors service
+        serviceIntent = new Intent(this, SensorService.class);
+        startService(serviceIntent);
+        filter = new IntentFilter();
+        filter.addAction("GET_PROXIMITY_GRAVITY_ACTION");
+        receiver = new SensorBroadcastReceiver(videoView);
         registerReceiver(receiver, filter);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        stopService(serviceIntent); // ends the service so it doesn't run in the background
     }
 
     @Override
@@ -123,14 +124,6 @@ public class MainActivity extends AppCompatActivity {
         decorView = getWindow().getDecorView();
         constraintSet = new ConstraintSet();
         constraintSet.clone(constraintLayout); // cache portrait layout constraints
-
-        // Initialize sensors service
-        serviceIntent = new Intent(this, SensorService.class);
-        startService(serviceIntent);
-        filter = new IntentFilter();
-        filter.addAction("GET_PROXIMITY_GRAVITY_ACTION");
-        receiver = new SensorBroadcastReceiver(videoView);
-        registerReceiver(receiver, filter);
     }
 
     /**
@@ -165,6 +158,9 @@ public class MainActivity extends AppCompatActivity {
                 videoView.seekTo(1); // create thumbnail
                 videoView.pause(); // video plays instantly without this
 
+                // keep screen on while there is a video loaded
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
                 isVideoReady = true;
                 setSourceTextViewColors();
             }
@@ -188,6 +184,9 @@ public class MainActivity extends AppCompatActivity {
                 fileBackground.setBackgroundColor(Color.TRANSPARENT); // no video source selected
                 isVideoReady = false;
                 if (isFullscreen) exitFullscreen();
+
+                // remove flags that keep screen on
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
                 return false;
             }

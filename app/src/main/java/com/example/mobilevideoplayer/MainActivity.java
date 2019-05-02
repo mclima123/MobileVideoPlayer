@@ -1,18 +1,23 @@
 package com.example.mobilevideoplayer;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.gesture.GestureOverlayView;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -24,6 +29,7 @@ import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import java.util.Objects;
@@ -45,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isFullscreen = false;
     private boolean isVideoReady = false;
     private static final int READ_REQUEST_CODE = 42;
+    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 96;
     private TextView filePathTextView;
     private TextView urlPathTextView;
     private VideoView videoView;
@@ -119,6 +126,44 @@ public class MainActivity extends AppCompatActivity {
             dialog.show();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openFileChooser();
+                }
+
+                break;
+            }
+        }
+    }
+
+    /**
+     * Checks if any dangerous permission hasn't been granted and requests it.
+     */
+    private void checkPermissions() {
+        // Check if read external storage permission has been granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                Toast.makeText(this, "No permission granted", Toast.LENGTH_SHORT).show();
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+            }
+        } else {
+            openFileChooser();
+        }
     }
 
     /**
@@ -240,11 +285,15 @@ public class MainActivity extends AppCompatActivity {
 
     // region onClick functions for choosing files and loading video.
 
+    public void onClickFileSearch(View view) {
+        checkPermissions();
+    }
+
     /**
      * Fires an intent to spin up the "file chooser" UI and select a video.
      * https://developer.android.com/guide/topics/providers/document-provider
      */
-    public void onClickFileSearch(View view) {
+    private void openFileChooser() {
         videoView.setVideoURI(null); //stops playing current video
         progressBar.setVisibility(View.GONE); //hides the progress bar in case it's till visible
 

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:padding="16dp">
 
@@ -25,8 +26,7 @@
         android:text="@string/swipe_left_back_15s"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/dialog_title"
-        app:layout_constraintStart_toStartOf="@+id/dialog_title"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dialog_title" />
 
     <TextView
@@ -37,8 +37,7 @@
         android:text="@string/swipe_right_forward_15s"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/dialog_title"
-        app:layout_constraintStart_toStartOf="@+id/dialog_title"
+        app:layout_constraintStart_toStartOf="@+id/gesture_1"
         app:layout_constraintTop_toBottomOf="@+id/gesture_1" />
 
     <TextView
@@ -49,8 +48,7 @@
         android:text="@string/swipe_up_volume_up"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/dialog_title"
-        app:layout_constraintStart_toStartOf="@+id/dialog_title"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/gesture_2" />
 
     <TextView
@@ -61,23 +59,20 @@
         android:text="@string/swipe_down_volume_down"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/dialog_title"
-        app:layout_constraintStart_toStartOf="@+id/dialog_title"
+        app:layout_constraintStart_toStartOf="@+id/gesture_3"
         app:layout_constraintTop_toBottomOf="@+id/gesture_3" />
 
     <TextView
         android:id="@+id/gesture_5"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
         android:text="@string/put_the_phone_facing_down_on_a_surface_to_pause_the_video"
-        android:textAlignment="center"
+        android:textAlignment="textStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/gesture_4"
+        app:layout_constraintStart_toStartOf="@+id/gesture_4"
         app:layout_constraintTop_toBottomOf="@+id/gesture_4" />
 
     <TextView
@@ -88,7 +83,6 @@
         android:text="@string/double_tap_to_play_pause"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/gesture_5"
         app:layout_constraintStart_toStartOf="@+id/gesture_5"
         app:layout_constraintTop_toBottomOf="@+id/gesture_5" />
 </android.support.constraint.ConstraintLayout>

@@ -8,11 +8,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.gesture.GestureOverlayView;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
@@ -67,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private Intent serviceIntent;
     private SensorBroadcastReceiver receiver;
     private IntentFilter filter;
+    private Uri fileStorageURI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,9 +104,9 @@ public class MainActivity extends AppCompatActivity {
         // On result from the file chooser activity
         if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             if (resultData != null) {
-                Uri uri = resultData.getData();
-                if (uri != null) {
-                    filePathTextView.setText(uri.toString());
+                fileStorageURI = resultData.getData();
+                if (fileStorageURI != null) {
+                    filePathTextView.setText(getFileName(fileStorageURI));
                     filePathTextView.setTextColor(Color.WHITE);
                 }
             }
@@ -310,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClickLoadFile(View view) {
         fileSource = FileSource.LOCAL;
         progressBar.setVisibility(View.VISIBLE); // shows progress bar while video loads
-        videoView.setVideoURI(Uri.parse(filePathTextView.getText().toString()));
+        videoView.setVideoURI(Uri.parse(fileStorageURI.toString()));
     }
 
     /**
@@ -419,5 +422,29 @@ public class MainActivity extends AppCompatActivity {
             fileBackground.setBackgroundColor(Color.TRANSPARENT);
             urlBackground.setBackgroundResource(R.drawable.rounded_corners_background_padding);
         }
+    }
+
+    /**
+     * Gets file name from URI.
+     * https://stackoverflow.com/questions/5568874/how-to-extract-the-file-name-from-uri-returned-from-intent-action-get-content
+     */
+    private String getFileName(Uri uri) {
+        String result = null;
+        if ("content".equals(uri.getScheme())) {
+            try (Cursor cursor = getContentResolver()
+                    .query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result != null ? result.lastIndexOf('/') : 0;
+            if (cut != -1) {
+                result = result != null ? result.substring(cut + 1) : null;
+            }
+        }
+        return result;
     }
 }

@@ -58,31 +58,6 @@
                 android:translationZ="4dp"
                 android:visibility="invisible" />
 
-            <ImageButton
-                android:id="@+id/fullscreen_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="end"
-                android:background="@color/colorHighlightGray"
-                android:contentDescription="@string/todo"
-                android:onClick="onClickFullscreen"
-                android:scaleType="fitCenter"
-                android:tint="@android:color/background_light"
-                android:translationZ="4dp"
-                app:srcCompat="@drawable/fullscreen_icon" />
-
-            <ImageButton
-                android:id="@+id/stop_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="start"
-                android:background="@color/colorHighlightGray"
-                android:contentDescription="@string/todo"
-                android:onClick="onClickStop"
-                android:scaleType="fitCenter"
-                android:tint="@android:color/background_light"
-                android:translationZ="4dp"
-                app:srcCompat="@drawable/stop_icon" />
         </android.gesture.GestureOverlayView>
     </FrameLayout>
 

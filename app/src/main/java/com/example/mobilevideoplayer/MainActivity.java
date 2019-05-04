@@ -27,7 +27,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -62,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
     private ConstraintLayout urlBackground;
     private ConstraintLayout fileBackground;
     private GestureOverlayView gestureOverlayView;
-    private ImageButton fullscreenButton;
     private FrameLayout frameLayout;
     private ConstraintLayout constraintLayout;
     private ConstraintSet constraintSet;
@@ -185,12 +183,11 @@ public class MainActivity extends AppCompatActivity {
         urlBackground = findViewById(R.id.url_container_layout);
         fileBackground = findViewById(R.id.file_container_layout);
         gestureOverlayView = findViewById(R.id.gestures_overlay);
-        fullscreenButton = findViewById(R.id.fullscreen_button);
         frameLayout = findViewById(R.id.video_container_layout);
         constraintLayout = findViewById(R.id.main_constraint_layout);
 
         // Initialize variables
-        mediaController = new MediaController(this);
+        mediaController = new VideoController(this, this);
         constraintSet = new ConstraintSet();
         constraintSet.clone(constraintLayout); // cache portrait layout constraints
 
@@ -230,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE); // hide progress bar
                 videoView.start(); // sometimes thumbnail doesn't show without this
                 videoView.seekTo(1); // create thumbnail
-                videoView.pause(); // video plays instantly without this
+                videoView.pause(); // sometimes video plays instantly without this
 
                 // keep screen on while there is a video loaded
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -328,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Handles click on fullscreen button.
      */
-    public void onClickFullscreen(View view) {
+    public void onClickFullscreen() {
         if (!isFullscreen && isVideoReady) {
             float ratio = (float) videoView.getWidth() / videoView.getHeight();
             enterFullscreen(ratio);
@@ -340,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Stops the video, if it's ready. (Pause and back to start)
      */
-    public void onClickStop(View view) {
+    public void onClickStop() {
         videoView.pause();
         videoView.seekTo(0);
     }
@@ -353,9 +350,6 @@ public class MainActivity extends AppCompatActivity {
      * https://stackoverflow.com/questions/18268218/change-screen-orientation-programmatically-using-a-button
      */
     private void enterFullscreen(float ratio) {
-        //hideSystemUI();
-        fullscreenButton.setImageResource(R.drawable.fullscreen_exit_icon); //sets appropriate icon
-
         // is video landscape?
         if (ratio > 1)
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -368,9 +362,6 @@ public class MainActivity extends AppCompatActivity {
      * Exits fullscreen.
      */
     private void exitFullscreen() {
-        //showSystemUI();
-        fullscreenButton.setImageResource(R.drawable.fullscreen_icon); // sets appropriate icon
-
         // if screen is in landscape, rotate to portrait
         if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);

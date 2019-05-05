@@ -10,7 +10,7 @@ import android.widget.MediaController;
 
 
 @SuppressLint("ViewConstructor")
-public class VideoController extends MediaController {
+public class VideoMediaController extends MediaController {
 
     private Context context;
     private ImageButton fullscreenButton;
@@ -18,7 +18,7 @@ public class VideoController extends MediaController {
     private MainActivity activity;
     private boolean isFullscreen = false;
 
-    public VideoController(Context context, MainActivity activity) {
+    public VideoMediaController(Context context, MainActivity activity) {
         super(context);
         this.context = context;
         this.activity = activity;
@@ -34,7 +34,7 @@ public class VideoController extends MediaController {
         params1.gravity = Gravity.END;
         params1.height = 100;
         params1.width = 100;
-        params1.topMargin = 25;
+        params1.topMargin = 30;
         addView(fullscreenButton, params1);
 
         stopButton = new ImageButton(context);
@@ -43,7 +43,7 @@ public class VideoController extends MediaController {
         params2.gravity = Gravity.START;
         params2.height = 100;
         params2.width = 100;
-        params2.topMargin = 25;
+        params2.topMargin = 30;
         addView(stopButton, params2);
 
         setNewButtonListeners();
@@ -53,7 +53,7 @@ public class VideoController extends MediaController {
         fullscreenButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                VideoController.super.show();
+                VideoMediaController.super.show();
 
                 if (!isFullscreen) {
                     fullscreenButton.setBackgroundResource(R.drawable.fullscreen_exit_icon);
@@ -70,7 +70,7 @@ public class VideoController extends MediaController {
         stopButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                VideoController.super.show();
+                VideoMediaController.super.show();
                 activity.onClickStop();
             }
         });

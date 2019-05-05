@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
         constraintLayout = findViewById(R.id.main_constraint_layout);
 
         // Initialize variables
-        mediaController = new VideoController(this, this);
+        mediaController = new VideoMediaController(this, this);
         constraintSet = new ConstraintSet();
         constraintSet.clone(constraintLayout); // cache portrait layout constraints
 

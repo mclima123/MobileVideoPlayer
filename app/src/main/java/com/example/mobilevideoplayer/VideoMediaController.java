@@ -15,13 +15,10 @@ public class VideoMediaController extends MediaController {
     private Context context;
     private ImageButton fullscreenButton;
     private ImageButton stopButton;
-    private MainActivity activity;
-    private boolean isFullscreen = false;
 
-    public VideoMediaController(Context context, MainActivity activity) {
+    public VideoMediaController(Context context) {
         super(context);
         this.context = context;
-        this.activity = activity;
     }
 
     @Override
@@ -45,34 +42,13 @@ public class VideoMediaController extends MediaController {
         params2.width = 100;
         params2.topMargin = 30;
         addView(stopButton, params2);
-
-        setNewButtonListeners();
     }
 
-    private void setNewButtonListeners() {
-        fullscreenButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                VideoMediaController.super.show();
+    public ImageButton getFullscreenButton() {
+        return fullscreenButton;
+    }
 
-                if (!isFullscreen) {
-                    fullscreenButton.setBackgroundResource(R.drawable.fullscreen_exit_icon);
-                    isFullscreen = true;
-                } else {
-                    fullscreenButton.setBackgroundResource(R.drawable.fullscreen_icon);
-                    isFullscreen = false;
-                }
-
-                activity.onClickFullscreen();
-            }
-        });
-
-        stopButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                VideoMediaController.super.show();
-                activity.onClickStop();
-            }
-        });
+    public ImageButton getStopButton() {
+        return stopButton;
     }
 }

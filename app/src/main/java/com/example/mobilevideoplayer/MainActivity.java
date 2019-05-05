@@ -27,7 +27,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView urlPathTextView;
     private VideoView videoView;
     private ProgressBar progressBar;
-    private MediaController mediaController;
+    private VideoMediaController mediaController;
     private ConstraintLayout urlBackground;
     private ConstraintLayout fileBackground;
     private GestureOverlayView gestureOverlayView;
@@ -187,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         constraintLayout = findViewById(R.id.main_constraint_layout);
 
         // Initialize variables
-        mediaController = new VideoMediaController(this, this);
+        mediaController = new VideoMediaController(this);
         constraintSet = new ConstraintSet();
         constraintSet.clone(constraintLayout); // cache portrait layout constraints
 
@@ -224,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
             public void onPrepared(MediaPlayer mp) {
                 videoView.setMediaController(mediaController);
                 mediaController.setAnchorView(gestureOverlayView); // anchor the media controls
+                setCustomButtonsListeners(); // sets custom buttons listeners
                 progressBar.setVisibility(View.GONE); // hide progress bar
                 videoView.start(); // sometimes thumbnail doesn't show without this
                 videoView.seekTo(1); // create thumbnail
@@ -267,6 +267,27 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onInfo(MediaPlayer mp, int what, int extra) {
                 return false;
+            }
+        });
+    }
+
+    /**
+     * Sets the listeners for the fullscreen and stop buttons added to the mediaController.
+     */
+    private void setCustomButtonsListeners() {
+        mediaController.getStopButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mediaController.show();
+                onClickStop();
+            }
+        });
+
+        mediaController.getFullscreenButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mediaController.show();
+                onClickFullscreen();
             }
         });
     }
@@ -350,6 +371,8 @@ public class MainActivity extends AppCompatActivity {
      * https://stackoverflow.com/questions/18268218/change-screen-orientation-programmatically-using-a-button
      */
     private void enterFullscreen(float ratio) {
+        mediaController.getFullscreenButton().setBackgroundResource(R.drawable.fullscreen_exit_icon);
+
         // is video landscape?
         if (ratio > 1)
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -362,6 +385,8 @@ public class MainActivity extends AppCompatActivity {
      * Exits fullscreen.
      */
     private void exitFullscreen() {
+        mediaController.getFullscreenButton().setBackgroundResource(R.drawable.fullscreen_icon);
+
         // if screen is in landscape, rotate to portrait
         if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);

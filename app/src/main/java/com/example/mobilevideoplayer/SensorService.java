@@ -32,6 +32,7 @@ public class SensorService extends Service {
     public int onStartCommand(Intent i, int flags, int id) {
 
         broadcastIntent.setAction("GET_PROXIMITY_GRAVITY_ACTION");
+        broadcastIntent.putExtra("PAUSE_VIDEO", true);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         // Register sensors, if they exist
@@ -60,8 +61,9 @@ public class SensorService extends Service {
      * Sends message notifying that the phone is facing down on a surface and video should pause.
      */
     private void notifyPause() {
-        broadcastIntent.putExtra("PAUSE_VIDEO", true);
-        sendBroadcast(broadcastIntent);
+        // Check orientation and proximity
+        if (gravityZ < -9.5 && proximity < 0.5) notifyPause();
+            sendBroadcast(broadcastIntent);
     }
 
     private class AccelerometerSensorListener implements SensorEventListener {
@@ -74,9 +76,7 @@ public class SensorService extends Service {
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
             gravityZ = sensorEvent.values[2];
-
-            // Check proximity sensor
-            if (proximity < 0.5 && gravityZ < -9.5) notifyPause();
+            notifyPause();
         }
     }
 
@@ -85,9 +85,7 @@ public class SensorService extends Service {
         @Override
         public void onSensorChanged(SensorEvent event) {
             proximity = event.values[0];
-
-            // Check proximity
-            if (gravityZ < -9.5 && proximity < 0.5) notifyPause();
+            notifyPause();
         }
 
         @Override

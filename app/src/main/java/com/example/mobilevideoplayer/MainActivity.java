@@ -329,9 +329,12 @@ public class MainActivity extends AppCompatActivity {
      * Loads the video into the videoView from the specified storage path
      */
     public void onClickLoadFile(View view) {
-        fileSource = FileSource.LOCAL;
-        progressBar.setVisibility(View.VISIBLE); // shows progress bar while video loads
-        videoView.setVideoURI(Uri.parse(fileStorageURI.toString()));
+        if(fileStorageURI != null){
+            fileSource = FileSource.LOCAL;
+            progressBar.setVisibility(View.VISIBLE); // shows progress bar while video loads
+            videoView.setVideoURI(Uri.parse(fileStorageURI.toString()));
+        }
+
     }
 
     /**

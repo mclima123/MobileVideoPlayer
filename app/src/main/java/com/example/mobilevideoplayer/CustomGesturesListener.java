@@ -46,12 +46,9 @@ public class CustomGesturesListener implements
         for (Prediction prediction : predictions) {
             // increased accuracy level, so this gesture doesn't get detected on accident.
             if (prediction.score > 4.0) {
-                switch (prediction.name) {
-                    case "restart": // circular gesture sets the timestamp to 0s
-                        videoView.seekTo(1);
-                        break;
-                    default:
-                        break;
+                // circular gesture sets the timestamp to 0s
+                if ("restart".equals(prediction.name)) {
+                    videoView.seekTo(1);
                 }
             }
         }

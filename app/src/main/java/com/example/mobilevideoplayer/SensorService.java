@@ -62,7 +62,7 @@ public class SensorService extends Service {
      */
     private void notifyPause() {
         // Check orientation and proximity
-        if (gravityZ < -9.5 && proximity < 0.5) notifyPause();
+        if (gravityZ < -9.5 && proximity < 0.5)
             sendBroadcast(broadcastIntent);
     }
 

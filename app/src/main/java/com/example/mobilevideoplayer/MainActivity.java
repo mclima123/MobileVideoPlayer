@@ -331,14 +331,8 @@ public class MainActivity extends AppCompatActivity {
     public void onClickLoadFile(View view) {
         fileSource = FileSource.LOCAL;
         progressBar.setVisibility(View.VISIBLE); // shows progress bar while video loads
-
-        if(fileStorageURI != null){
-            videoView.setVideoURI(Uri.parse(fileStorageURI.toString()));
-        }
-        else{ // to fire error dialog, consistent with load url button
-            videoView.setVideoURI(Uri.parse(""));
-        }
-
+        String uri = fileStorageURI == null ? "" : fileStorageURI.toString();
+        videoView.setVideoURI(Uri.parse(uri));
     }
 
     /**

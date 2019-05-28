@@ -11,7 +11,6 @@ import android.gesture.Prediction;
 import android.media.AudioManager;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import java.util.ArrayList;
@@ -22,12 +21,13 @@ public class CustomGesturesListener implements
 
     private VideoView videoView;
     private GestureLibrary gestureLibrary;
-    private static final int MIN_DISTANCE = 200; // minimum distance to consider a swipe
-    private static final int videoSeekJump = 15000; // 15s jumps
-    private float downX, downY;
-    private static final long doubleTapInterval = 200; // interval to detect double tap
-    private long prevTapTime = 0;
     private AudioManager audioManager;
+    private static final int MIN_DISTANCE = 200; // minimum distance to consider a swipe
+    private static final int videoSeekForwardJump = 15000; // 15s jumps
+    private static final int videoSeekBackwardJump = 5000; // 5s jumps
+    private static final long doubleTapInterval = 200; // interval to detect double tap
+    private float downX, downY;
+    private long prevTapTime = 0;
 
     public CustomGesturesListener(Activity activity, VideoView videoView) {
         gestureLibrary = GestureLibraries.fromRawResource(activity, R.raw.gestures);
@@ -46,8 +46,6 @@ public class CustomGesturesListener implements
         for (Prediction prediction : predictions) {
             // increased accuracy level, so this gesture doesn't get detected on accident.
             if (prediction.score > 4.0) {
-                //Toast.makeText(activity, prediction.name, Toast.LENGTH_SHORT).show();
-
                 switch (prediction.name) {
                     case "restart": // circular gesture sets the timestamp to 0s
                         videoView.seekTo(1);
@@ -65,13 +63,11 @@ public class CustomGesturesListener implements
     private void onRightSwipe() {
         int currentTimestamp = videoView.getCurrentPosition();
 
-        if (currentTimestamp + videoSeekJump < videoView.getDuration()) {
-            videoView.seekTo(currentTimestamp + videoSeekJump);
+        if (currentTimestamp + videoSeekForwardJump < videoView.getDuration()) {
+            videoView.seekTo(currentTimestamp + videoSeekForwardJump);
         } else {
             videoView.seekTo(videoView.getDuration());
         }
-
-        //Toast.makeText(activity, "right swipe", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -80,13 +76,11 @@ public class CustomGesturesListener implements
     private void onLeftSwipe() {
         int currentTimestamp = videoView.getCurrentPosition();
 
-        if (currentTimestamp - videoSeekJump > 0) {
-            videoView.seekTo(currentTimestamp - videoSeekJump);
+        if (currentTimestamp - videoSeekBackwardJump > 0) {
+            videoView.seekTo(currentTimestamp - videoSeekBackwardJump);
         } else {
             videoView.seekTo(1);
         }
-
-        //Toast.makeText(activity, "left swipe", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -95,8 +89,6 @@ public class CustomGesturesListener implements
     private void onUpSwipe() {
         audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
                 AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
-
-        //Toast.makeText(activity, "up swipe", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -105,8 +97,6 @@ public class CustomGesturesListener implements
     private void onDownSwipe() {
         audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
                 AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
-
-        //Toast.makeText(activity, "down swipe", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -117,8 +107,6 @@ public class CustomGesturesListener implements
             videoView.pause();
         else
             videoView.start();
-
-        //Toast.makeText(activity, "double tap", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -151,11 +139,11 @@ public class CustomGesturesListener implements
                     if (Math.abs(deltaX) > MIN_DISTANCE) {
                         // left or right
                         if (deltaX > 0) {
-                            this.onRightSwipe();
+                            onRightSwipe();
                             return true;
                         }
                         if (deltaX < 0) {
-                            this.onLeftSwipe();
+                            onLeftSwipe();
                             return true;
                         }
                     } else {
@@ -167,18 +155,17 @@ public class CustomGesturesListener implements
                     if (Math.abs(deltaY) > MIN_DISTANCE) {
                         // top or down
                         if (deltaY < 0) {
-                            this.onDownSwipe();
+                            onDownSwipe();
                             return true;
                         }
                         if (deltaY > 0) {
-                            this.onUpSwipe();
+                            onUpSwipe();
                             return true;
                         }
                     } else {
                         return false; // We don't consume the event
                     }
                 }
-
                 return true;
             }
         }
